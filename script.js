@@ -54,7 +54,10 @@
 var PLAYER = "PLAYER";
 var DEALER = "DEALER";
 var gameState = PLAYER;
-var gameStart = false;
+var GAME_STARTED = false;
+var gameState = PLAYER;
+var HIT_OR_STAND = "HIT_OR_STAND";
+var PROMPT_STATE = "PROMPT_STATE";
 
 //scoring of cards
 var player_cards = [];
@@ -386,10 +389,10 @@ var getScore = function (cardArray) {
 };
 
 // print out the content of cards it currently has
-var getCardMsg = function (cardArray) {
+var getCardMsg = function (cardArray, length = cardArray.length) {
   counter = 0;
   output = "";
-  for (i = 0; i < cardArray.length; i++) {
+  for (i = 0; i < length; i++) {
     output =
       output +
       `Card No. ${counter + 1} : ${cardArray[i].name} of ${
@@ -400,23 +403,70 @@ var getCardMsg = function (cardArray) {
   return output;
 };
 
+// determine winner
+var determineWinner = function () {
+  if (dealerSum > playerSum) {
+    output = `Dealer Wins! Dealer total points are ${dealerSum} <br> Dealer's cards are: <br> ${getCardMsg(
+      dealerCard
+    )} <br><br> Your total points are: ${playerSum} <br> Your cards are: <br> ${getCardMsg(
+      playerCard
+    )}`;
+  } else if (playerSum > dealerSum) {
+    output = `Player Wins! Your total points are ${playerSum} <br> Your cards are: <br> ${getCardMsg(
+      playerCard
+    )} <br><br> Player's total points are: ${dealerSum} <br> Player's cards are: <br> ${getCardMsg(
+      dealerCard
+    )}`;
+  } else {
+    output = `It's a tie! Your points are ${playerSum} <br> Your cards are: <br> ${getCardMsg(
+      playerCard
+    )} <br><br> Player's total points are: ${dealerSum} <br> Player's cards are: <br> ${getCardMsg(
+      dealerCard
+    )}`;
+  }
+
+  return output;
+};
+
 // main function
 var main = function (input) {
   console.log(shuffledDeck.length);
 
-  var dealerCard = getCard(2, DEALER);
-  var playerCard = getCard(2, PLAYER);
+  if (gameState == PLAYER) {
+    // getting 2 cards from each player
+    var dealerCard = getCard(2, DEALER);
+    var playerCard = getCard(2, PLAYER);
 
-  console.log(dealerCard);
-  console.log(playerCard);
-  console.log(shuffledDeck.length);
+    console.log(dealerCard);
+    console.log(playerCard);
+    console.log(shuffledDeck.length);
 
-  dealer_sum = getScore(dealerCard);
-  player_sum = getScore(playerCard);
-  output = getCardMsg(dealerCard);
+    // calculating the score of both dealer and player
+    dealerSum = getScore(dealerCard);
+    playerSum = getScore(playerCard);
 
-  console.log("dealer's sum: " + dealer_sum);
-  console.log("player's sum: " + player_sum);
+    console.log("dealer's sum: " + dealerSum);
+    console.log("player's sum: " + playerSum);
+    gameState = HIT_OR_STAND;
 
+    return `Dealer's card: <br> ${getCardMsg(
+      dealerCard,
+      1
+    )} <br><br> Player's card: <br> ${getCardMsg(
+      playerCard
+    )} <br><br> Player's turn: hit or stand? `;
+  }
+
+  console.log(gameState);
+
+  if (gameState == HIT_OR_STAND) {
+    if (input !== "hit" && input !== "stand") {
+      output = "Please key in either hit or stand";
+    } else {
+      output = "hit passed";
+      gameMode = input;
+      console.log(gameMode);
+    }
+  }
   return output;
 };
